@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TraingCoach</string>
+    <string name="start">START</string>
+    <string name="stop">STOPP</string>
 </resources>
