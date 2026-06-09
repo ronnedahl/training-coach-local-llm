@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,32 +20,54 @@ import dev.peterbot.traingcoach.R
 import dev.peterbot.traingcoach.viewmodel.HypeViewModel
 
 /**
- * The whole step 1 UI: a counting timer and one big START/STOPP button.
+ * The step 2 workout screen: a persona selector before the set, plus the step 1
+ * timer and START/STOPP button. The selector is hidden while a set runs so the
+ * running screen stays minimal.
  */
 @Composable
-fun CoachScreen(vm: HypeViewModel, modifier: Modifier = Modifier) {
+fun CoachScreen(
+    vm: HypeViewModel,
+    persona: String,
+    onPersonaChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = formatElapsed(vm.elapsed),
-            style = MaterialTheme.typography.displayLarge
-        )
+        if (!vm.isRunning) {
+            PersonaSelector(
+                persona = persona,
+                onPersonaChange = onPersonaChange,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
-        Spacer(Modifier.height(48.dp))
-
-        Button(
-            onClick = vm::toggle,
-            modifier = Modifier.size(width = 240.dp, height = 120.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(if (vm.isRunning) R.string.stop else R.string.start),
-                style = MaterialTheme.typography.headlineMedium
+                text = formatElapsed(vm.elapsed),
+                style = MaterialTheme.typography.displayLarge
             )
+
+            Spacer(Modifier.height(48.dp))
+
+            Button(
+                onClick = vm::toggle,
+                modifier = Modifier.size(width = 240.dp, height = 120.dp)
+            ) {
+                Text(
+                    text = stringResource(if (vm.isRunning) R.string.stop else R.string.start),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
         }
     }
 }

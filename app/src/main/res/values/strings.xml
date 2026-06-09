@@ -2,4 +2,9 @@
     <string name="app_name">TraingCoach</string>
     <string name="start">START</string>
     <string name="stop">STOPP</string>
+    <string name="persona_title">Vem peppar dig?</string>
+    <string name="persona_drill_sergeant">Drillsergeant</string>
+    <string name="persona_supportive_coach">Stöttande coach</string>
+    <string name="persona_sarcastic_pt">Sarkastisk PT</string>
+    <string name="persona_custom_label">Egen persona</string>
 </resources>
