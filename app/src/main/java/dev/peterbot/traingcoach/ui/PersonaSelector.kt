@@ -2,8 +2,6 @@ package dev.peterbot.traingcoach.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilterChip
@@ -19,10 +17,13 @@ import dev.peterbot.traingcoach.persona.PersonaPresets
 
 /**
  * Lets the user pick who should hype them: a preset chip or a free text persona.
- * The selected value is the LLM prompt value; the chip whose [promptValue]
- * matches is highlighted, otherwise the free text field holds the value.
+ * The selected value is the LLM prompt value; the chip whose promptValue matches
+ * is highlighted, otherwise the free text field holds the value.
+ *
+ * Chips are stacked in a plain Column on purpose: FlowRow is an experimental
+ * foundation API and is prone to version skew, and a vertical list of three
+ * presets is clear and never overflows the width.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PersonaSelector(
     persona: String,
@@ -32,24 +33,20 @@ fun PersonaSelector(
     val presets = PersonaPresets.all
     val matchedPreset = presets.firstOrNull { it.promptValue == persona }
 
-    Column(modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Text(
             text = stringResource(R.string.persona_title),
             style = MaterialTheme.typography.titleMedium
         )
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            presets.forEach { preset ->
-                FilterChip(
-                    selected = preset == matchedPreset,
-                    onClick = { onPersonaChange(preset.promptValue) },
-                    label = { Text(stringResource(preset.labelRes)) }
-                )
-            }
+        presets.forEach { preset ->
+            FilterChip(
+                selected = preset == matchedPreset,
+                onClick = { onPersonaChange(preset.promptValue) },
+                label = { Text(stringResource(preset.labelRes)) }
+            )
         }
         OutlinedTextField(
             value = if (matchedPreset == null) persona else "",
