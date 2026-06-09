@@ -13,7 +13,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.peterbot.traingcoach.audio.CachedHypeSource
 import dev.peterbot.traingcoach.audio.DefaultHypePhrases
+import dev.peterbot.traingcoach.audio.HypeCache
 import dev.peterbot.traingcoach.audio.RawResHypeSource
 import dev.peterbot.traingcoach.ui.CoachScreen
 import dev.peterbot.traingcoach.ui.theme.TraingCoachTheme
@@ -38,14 +40,16 @@ class MainActivity : ComponentActivity() {
 }
 
 /**
- * Wires the step 1 player: the bundled res/raw phrases behind [RawResHypeSource].
- * Step 2 only has to swap the source passed to the factory here.
+ * Wires the player to the step 2 source: generated phrases from the hype cache,
+ * falling back to the bundled res/raw phrases while the cache is still empty.
+ * The player and ViewModel are unchanged from step 1, only the source differs.
  */
 @Composable
 private fun rememberHypeViewModel(): HypeViewModel {
     val application = LocalContext.current.applicationContext as Application
     val hypeSource = remember(application) {
-        RawResHypeSource(application, DefaultHypePhrases.rawResIds)
+        val fallback = RawResHypeSource(application, DefaultHypePhrases.rawResIds)
+        CachedHypeSource(HypeCache.dir(application), fallback)
     }
     return viewModel(factory = HypeViewModelFactory(application, hypeSource))
 }
