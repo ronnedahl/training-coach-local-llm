@@ -17,10 +17,13 @@ import dev.peterbot.traingcoach.audio.CachedHypeSource
 import dev.peterbot.traingcoach.audio.DefaultHypePhrases
 import dev.peterbot.traingcoach.audio.HypeCache
 import dev.peterbot.traingcoach.audio.RawResHypeSource
+import dev.peterbot.traingcoach.persona.SharedPrefsPersonaRepository
 import dev.peterbot.traingcoach.ui.CoachScreen
 import dev.peterbot.traingcoach.ui.theme.TraingCoachTheme
 import dev.peterbot.traingcoach.viewmodel.HypeViewModel
 import dev.peterbot.traingcoach.viewmodel.HypeViewModelFactory
+import dev.peterbot.traingcoach.viewmodel.PersonaViewModel
+import dev.peterbot.traingcoach.viewmodel.PersonaViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,8 +32,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             TraingCoachTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    val personaVm = rememberPersonaViewModel()
                     CoachScreen(
                         vm = rememberHypeViewModel(),
+                        persona = personaVm.persona,
+                        onPersonaChange = personaVm::select,
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -52,4 +58,15 @@ private fun rememberHypeViewModel(): HypeViewModel {
         CachedHypeSource(HypeCache.dir(application), fallback)
     }
     return viewModel(factory = HypeViewModelFactory(application, hypeSource))
+}
+
+/**
+ * Wires the persona ViewModel to a SharedPreferences backed repository. The
+ * chosen persona is read back by the background generation job in later PRs.
+ */
+@Composable
+private fun rememberPersonaViewModel(): PersonaViewModel {
+    val context = LocalContext.current.applicationContext
+    val repository = remember(context) { SharedPrefsPersonaRepository(context) }
+    return viewModel(factory = PersonaViewModelFactory(repository))
 }
