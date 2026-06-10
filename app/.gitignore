@@ -1,1 +1,3 @@
 /build
+# Downloaded on demand by the downloadSherpaOnnx Gradle task.
+/libs
